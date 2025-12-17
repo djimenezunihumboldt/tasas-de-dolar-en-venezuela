@@ -1,0 +1,41 @@
+name: Update rates JSON
+'on':
+  workflow_dispatch:
+  schedule:
+    # Cada 30 minutos
+    - cron: '*/30 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate static rates JSON
+        run: npm --workspace api run generate:static
+
+      - name: Commit and push if changed
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add app/public/rates-today.json
+            git commit -m "chore: update rates-today.json"
+            git push
+          else
+            echo "No changes"
+          fi

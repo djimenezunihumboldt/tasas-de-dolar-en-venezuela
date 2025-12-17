@@ -1,0 +1,9 @@
+{
+  "updatedAt": "2025-12-16T10:00:00-04:00",
+  "rates": [
+    { "id": "bcv", "name": "Dólar BCV", "value": 273.59 },
+    { "id": "paralelo", "name": "Dólar Paralelo", "value": 442.19 },
+    { "id": "binance", "name": "Binance / Kontigo", "value": 425.0 },
+    { "id": "bybit", "name": "Bybit", "value": 424.06 }
+  ]
+}

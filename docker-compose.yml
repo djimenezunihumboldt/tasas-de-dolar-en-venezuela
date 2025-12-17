@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ./api
+    container_name: tasas_api
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./api/data:/usr/src/app/data:ro
+
+  app:
+    build:
+      context: ./app
+    container_name: tasas_app
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - api

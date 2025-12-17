@@ -1,0 +1,23 @@
+{
+  "name": "tasas-de-dolar-en-venezuela",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n api,app -c blue,green \"npm --workspace api run dev\" \"npm --workspace app run dev\"",
+    "dev:api": "npm --workspace api run dev",
+    "dev:app": "npm --workspace app run dev"
+  },
+  "workspaces": [
+    "api",
+    "app"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
