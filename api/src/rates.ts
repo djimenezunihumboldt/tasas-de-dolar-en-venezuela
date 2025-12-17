@@ -399,4 +399,3 @@ export function startBackgroundRefresh(): void {
   }, refreshIntervalMs);
 }
 
-git remote -v
