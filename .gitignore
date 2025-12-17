@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.DS_Store
+/.idea
+/.vscode
+/*.log
+/.webpack
+.npm
+coverage/
+android/.gradle
+android/app/build
+app/android/app/build
+api/data/*.cache

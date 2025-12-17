@@ -70,7 +70,7 @@ export default defineConfig([
 ])
 ## Build y despliegue
 
-![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/canel/tasas-de-dolar-en-venezuela/actions/workflows/ci.yml/badge.svg)
 
 - Generar build para web (producción):
 
