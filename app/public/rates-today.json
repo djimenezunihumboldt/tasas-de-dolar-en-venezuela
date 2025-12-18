@@ -1,43 +1,54 @@
 {
-  "updatedAt": "2025-12-17T16:42:59.398Z",
+  "updatedAt": "2025-12-18T06:26:30.153Z",
   "rates": [
     {
       "id": "bcv",
       "name": "Dólar BCV",
-      "value": 276.5769,
+      "value": 279.5629,
+      "currency": "VES",
+      "unit": "USD"
+    },
+    {
+      "id": "paralelo",
+      "name": "Dólar Paralelo",
+      "value": 448.6,
       "currency": "VES",
       "unit": "USD"
     },
     {
       "id": "binance",
-      "name": "Dólar Binance",
-      "value": 443.5,
+      "name": "Binance / Kontigo",
+      "value": 460.2,
       "currency": "VES",
       "unit": "USD"
     },
     {
       "id": "bybit",
       "name": "Bybit",
-      "value": 444.995,
+      "value": 464.9,
       "currency": "VES",
       "unit": "USD"
     }
   ],
   "meta": {
-    "lastAttemptAt": "2025-12-17T16:42:59.398Z",
-    "lastSuccessAt": "2025-12-17T16:42:59.398Z",
+    "lastAttemptAt": "2025-12-18T06:26:30.153Z",
+    "lastSuccessAt": "2025-12-18T06:26:30.153Z",
     "sources": {
-      "bcv": {
+      "paralelo": {
         "ok": true,
-        "updatedAt": "2025-12-17T16:42:59.398Z"
+        "updatedAt": "2025-12-18T06:26:30.153Z"
       },
       "binance": {
         "ok": true,
-        "updatedAt": "2025-12-17T16:42:59.398Z"
+        "updatedAt": "2025-12-18T06:26:30.153Z"
       },
       "bybit": {
         "ok": true,
-        "updatedAt": "2025-12-17T16:42:59.398Z"
+        "updatedAt": "2025-12-18T06:26:30.153Z"
+      },
+      "bcv": {
+        "ok": true,
+        "updatedAt": "2025-12-18T06:26:30.153Z"
       }
     }
   }
