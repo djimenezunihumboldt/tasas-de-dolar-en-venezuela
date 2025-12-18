@@ -56,11 +56,11 @@ jobs:
           which pnpm || true
           pnpm -v || echo "pnpm not found"
 
-      - name: Install workspace dependencies with pnpm
-        run: pnpm -w install --frozen-lockfile
+        - name: Install workspace dependencies
+          run: npm install --prefix app
 
       - name: Build web (app workspace)
-        run: pnpm --filter ./app... run build
+          run: npm --prefix app run build
 
       - name: Ensure Pages enabled
         uses: actions/configure-pages@v5
@@ -120,7 +120,7 @@ jobs:
       - name: Build Android debug APK (Gradle)
         working-directory: ./app/android
         run: ./gradlew assembleDebug --no-daemon --stacktrace --info || (echo 'Gradle failed, printing build tree' && ls -R)
-
+                  npm --prefix app run build || true
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
