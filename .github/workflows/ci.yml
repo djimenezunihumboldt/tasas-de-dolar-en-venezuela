@@ -29,13 +29,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install root dependencies (no optional)
-        run: npm ci --no-optional
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
-      - name: Build web (workspace)
-        run: npm --workspace app run build
+      - name: Install workspace dependencies with pnpm
+        run: pnpm -w install --frozen-lockfile
+
+      - name: Build web (app workspace)
+        run: pnpm --filter ./app... run build
 
       - name: Ensure Pages enabled
         uses: actions/configure-pages@v5
@@ -59,11 +64,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '21'
 
       - name: Install Android command-line tools
         run: |
