@@ -1,5 +1,5 @@
-# YAML schema for GitHub Actions (helps the YAML language server)
-$schema: https://json.schemastore.org/github-workflow
+# YAML schema for GitHub Actions (language server only)
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
 name: CI — Build, Deploy & Android APK
 
 on:
