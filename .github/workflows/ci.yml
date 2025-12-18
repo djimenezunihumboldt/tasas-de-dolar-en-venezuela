@@ -36,6 +36,9 @@ jobs:
         with:
           version: latest
 
+      - name: Install pnpm globally (failsafe)
+        run: npm install -g pnpm
+
       - name: Install workspace dependencies with pnpm
         run: pnpm -w install --frozen-lockfile
 
@@ -81,6 +84,9 @@ jobs:
 
       - name: Accept licenses
         run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Ensure gradlew is executable
+        run: chmod +x app/android/gradlew
 
       - name: Build Android debug APK (Gradle)
         working-directory: ./app/android
