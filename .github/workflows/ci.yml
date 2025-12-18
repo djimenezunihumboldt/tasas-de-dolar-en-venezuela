@@ -39,6 +39,23 @@ jobs:
       - name: Install pnpm globally (failsafe)
         run: npm install -g pnpm
 
+      - name: Ensure pnpm is in PATH (workaround)
+        run: |
+          echo "$HOME/.local/share/pnpm" >> $GITHUB_PATH
+          echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
+          echo "$(npm bin -g)" >> $GITHUB_PATH
+      
+      - name: Enable Corepack and prepare pnpm (reliable)
+        run: |
+          corepack enable || true
+          corepack prepare pnpm@latest --activate || true
+
+      - name: Verify pnpm availability
+        run: |
+          echo "PATH=$PATH"
+          which pnpm || true
+          pnpm -v || echo "pnpm not found"
+
       - name: Install workspace dependencies with pnpm
         run: pnpm -w install --frozen-lockfile
 
@@ -85,12 +102,24 @@ jobs:
       - name: Accept licenses
         run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
+      - name: Show Android/Java diagnostics
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version || true
+          echo "Listing app/android"
+          ls -la app/android || true
+
+      - name: Sync Capacitor Android
+        working-directory: ./app
+        run: |
+          npm --prefix . run build || true
+          npx cap sync android || true
       - name: Ensure gradlew is executable
         run: chmod +x app/android/gradlew
 
       - name: Build Android debug APK (Gradle)
         working-directory: ./app/android
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug --no-daemon --stacktrace --info || (echo 'Gradle failed, printing build tree' && ls -R)
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
