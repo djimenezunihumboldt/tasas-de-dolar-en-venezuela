@@ -1,6 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow
 name: CI — Build, Deploy & Android APK
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
 name: CI — Build, Deploy & Android APK
 
 on:
