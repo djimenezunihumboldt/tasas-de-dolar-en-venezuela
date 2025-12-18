@@ -23,11 +23,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Ensure Pages enabled
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
+      - name: Verify docs folder
+        run: |
+          if [ ! -d "docs" ]; then echo "docs directory missing"; ls -la || exit 1; fi
+
+      - name: Setup git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
