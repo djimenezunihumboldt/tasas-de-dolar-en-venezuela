@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     # run independently so APK artifact is produced even if web build fails
     env:
-      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+      ANDROID_SDK_ROOT: ${{ github.workspace }}/.android-sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
