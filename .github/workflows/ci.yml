@@ -31,8 +31,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install root dependencies
-        run: npm ci
+      - name: Install root dependencies (no optional)
+        run: npm ci --no-optional
 
       - name: Build web (workspace)
         run: npm --workspace app run build
