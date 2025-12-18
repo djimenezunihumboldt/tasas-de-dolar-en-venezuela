@@ -2,8 +2,8 @@ name: Update rates JSON
 'on':
   workflow_dispatch:
   schedule:
-    # Cada 30 minutos
-    - cron: '*/30 * * * *'
+    # Cada 5 minutos
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
