@@ -136,9 +136,34 @@ async function fetchBcvUsdVes(): Promise<number> {
       e && typeof e === "object" && "cause" in e
         ? (e as { cause?: { code?: unknown } }).cause?.code
         : undefined;
-    // Workaround común en Windows: Node no valida el chain, pero WinHTTP sí.
-    if (causeCode === "UNABLE_TO_VERIFY_LEAF_SIGNATURE") {
-      html = await fetchHtmlViaPowerShell(url);
+    // Workaround común: Node no valida el chain, pero navegadores/WinHTTP sí.
+    if (causeCode === "UNABLE_TO_VERIFY_LEAF_SIGNATURE" || causeCode === "CERT_HAS_EXPIRED") {
+      if (process.platform === "win32") {
+        html = await fetchHtmlViaPowerShell(url);
+      } else {
+        // Fallback para Linux/GitHub Actions: Desactivar verificación SSL temporalmente
+        // Esto es necesario para scrapear sitios con configuración TLS antigua/incompleta
+        const originalEnv = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        try {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+          // Reintentamos el fetch sin validación estricta SSL
+          const res = await fetch(url, {
+            headers: {
+              accept: "text/html",
+              "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            },
+          });
+          if (!res.ok) throw new Error(`BCV Fallback HTTP ${res.status}`);
+          html = await res.text();
+        } finally {
+          // Restauramos la seguridad
+          if (originalEnv === undefined) {
+            delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+          } else {
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalEnv;
+          }
+        }
+      }
     } else {
       throw e instanceof Error ? e : new Error(String(e));
     }
