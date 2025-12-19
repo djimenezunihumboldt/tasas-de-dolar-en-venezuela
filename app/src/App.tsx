@@ -40,22 +40,22 @@ function RateLogo({ id, name }: { id: string; name: string }) {
   if (id === 'binance') {
     return (
       <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <img src={binanceImg} alt="Binance" width={size} height={size} className="logo-img" style={{objectFit:'cover'}} />
-        <img src={kontigoImg} alt="Kontigo" width={size} height={size} className="logo-img" style={{objectFit:'cover', background:'#fff'}} />
+        <img src={binanceImg} alt="Binance" width={size} height={size} className="logo-img" style={{ objectFit: 'cover' }} />
+        <img src={kontigoImg} alt="Kontigo" width={size} height={size} className="logo-img" style={{ objectFit: 'cover', background: '#fff' }} />
       </span>
     );
   }
   // Bybit: usar imagen real
   if (id === 'bybit') {
     return (
-      <img src={bybitImg} alt="Bybit" width={size} height={size} className="logo-img" style={{objectFit:'cover'}} />
+      <img src={bybitImg} alt="Bybit" width={size} height={size} className="logo-img" style={{ objectFit: 'cover' }} />
     );
   }
 
   if (id === 'paralelo') {
     return (
       <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" rx="20" fill="#047857"/>
+        <rect width="100" height="100" rx="20" fill="#047857" />
         <text x="50" y="70" fontSize="60" fontWeight="900" fill="white" textAnchor="middle">$</text>
       </svg>
     )
@@ -114,9 +114,9 @@ function RateCard({ rate }: { rate: Rate }) {
       </div>
       <div className="cardValueRow">
         <div className="cardValue">{formatBs(rate.value)}</div>
-        <button 
-          className="copyBtn" 
-          onClick={handleCopy} 
+        <button
+          className="copyBtn"
+          onClick={handleCopy}
           aria-label="Copiar tasa"
           title="Copiar tasa"
         >
@@ -185,10 +185,11 @@ function formatUpdatedAt(iso: string) {
 }
 
 function App() {
-  console.log('App rendering')
   const [data, setData] = useState<RatesTodayResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  // activeId is the single source of truth for which card is shown
+  const [activeId, setActiveId] = useState<string | null>(null)
 
   const updatedText = useMemo(() => {
     if (!data?.updatedAt) return '—'
@@ -202,11 +203,26 @@ function App() {
     return data.rates.filter((r) => r.name.toLowerCase().includes(lower))
   }, [data?.rates, searchTerm])
 
+  // Initialize activeId ONLY when data arrives and we have no selection
+  useEffect(() => {
+    if (data?.rates && data.rates.length > 0 && !activeId) {
+      setActiveId(data.rates[0].id)
+    }
+  }, [data?.rates, activeId])
+
+  const handleLogoClick = (rateId: string) => {
+    setActiveId(rateId)
+    // If the selected rate is hidden by search, clear the search
+    if (searchTerm && !filteredRates.some(fr => fr.id === rateId)) {
+      setSearchTerm('')
+    }
+  }
+
   const handleShare = async () => {
     if (!data) return
-    const text = `Tasas del día (${updatedText}):\n` + 
+    const text = `Tasas del día (${updatedText}):\n` +
       data.rates.map(r => `${r.name}: ${formatBs(r.value)}`).join('\n')
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -227,16 +243,18 @@ function App() {
     }
   }
 
+  // Data fetching
   useEffect(() => {
     let cancelled = false
-
     const refreshEveryMs = 30_000
 
     async function load() {
       try {
         setError(null)
-        const url = import.meta.env.DEV ? '/api/rates/today' : './rates-today.json'
-        const res = await fetch(url)
+        const url = import.meta.env.DEV
+          ? '/api/rates/today'
+          : `./rates-today.json?t=${Date.now()}`
+        const res = await fetch(url, { cache: 'no-store' })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const json = (await res.json()) as RatesTodayResponse
         if (!cancelled) setData(json)
@@ -262,12 +280,12 @@ function App() {
         <header className="header">
           <h1 className="title">Cotizaciones del día</h1>
           <div className="subtitle">Actualizado: {updatedText}</div>
-          
+
           <div className="controls">
-            <input 
+            <input
               className="searchInput"
-              type="search" 
-              placeholder="Buscar tasa..." 
+              type="search"
+              placeholder="Buscar tasa..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -279,15 +297,53 @@ function App() {
 
         {error ? <div className="error">Error: {error}</div> : null}
 
-        <section className="cards" aria-label="Tasas de hoy">
-          {filteredRates.map((rate) => (
-            <RateCard key={rate.id} rate={rate} />
-          ))}
+        {/* Logo navigation */}
+        {data?.rates && (
+          <div className="logo-nav" role="tablist" aria-label="Navegación por tasas">
+            {data.rates.map((r) => {
+              const idxInFiltered = filteredRates.findIndex(fr => fr.id === r.id)
+              const isVisible = idxInFiltered !== -1
+              const isActive = activeId === r.id
+              return (
+                <button
+                  type="button"
+                  key={r.id}
+                  className={`logo-nav-btn ${isActive ? 'is-active' : ''} ${!isVisible ? 'is-hidden' : ''}`}
+                  onClick={() => handleLogoClick(r.id)}
+                  aria-pressed={isActive}
+                  title={r.name}
+                >
+                  <span style={{ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-hidden>
+                    <RateLogo id={r.id} name={r.name} />
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
 
-          {!data && !error ? <div className="loading">Cargando…</div> : null}
-          {data && filteredRates.length === 0 ? (
-            <div className="emptyState">No se encontraron tasas con ese nombre.</div>
-          ) : null}
+        <section className="cards" aria-label="Tasas de hoy">
+          {!data && !error ? (
+            <div className="loading">Cargando…</div>
+          ) : data && data.rates.length === 0 ? (
+            <div className="emptyState">No hay tasas disponibles.</div>
+          ) : (
+            (() => {
+              // Find the rate to show
+              // First try activeId
+              const activeById = activeId ? data?.rates.find(r => r.id === activeId) : null
+              // Fallback to first filtered, or first available
+              const rate = activeById ?? filteredRates[0] ?? data?.rates[0]
+
+              if (!rate) return null
+
+              return (
+                <div className="singleCardWrapper">
+                  <RateCard key={rate.id} rate={rate} />
+                </div>
+              )
+            })()
+          )}
         </section>
       </div>
     </div>
